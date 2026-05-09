@@ -1,0 +1,11 @@
+streamlit
+fastapi
+uvicorn
+requests
+pillow
+pandas
+scikit-learn
+xgboost
+python-multipart
+joblib
+tensorflow
