@@ -5,41 +5,72 @@ from sklearn.preprocessing import LabelEncoder
 from xgboost import XGBRegressor
 
 
-data = {
-    "location": [
-        "Jagatpura", "Jagatpura", "Jagatpura",
-        "Malviya Nagar", "Malviya Nagar",
-        "Mansarovar", "Mansarovar",
-        "Vaishali Nagar", "Vaishali Nagar",
-        "C-Scheme", "C-Scheme",
-        "Ajmer Road", "Ajmer Road"
-    ],
-    "sqft": [1050, 1400, 1800, 1500, 2200, 1250, 1800, 1100, 1700, 1800, 3000, 1500, 2400],
-    "bedrooms": [2, 3, 3, 3, 4, 2, 3, 2, 3, 3, 5, 0, 3],
-    "bathrooms": [2, 2, 3, 2, 4, 2, 3, 2, 3, 3, 5, 0, 3],
-    "balcony": [1, 2, 2, 2, 3, 1, 2, 1, 2, 2, 4, 0, 2],
-    "age_of_property": [4, 3, 2, 7, 4, 8, 5, 6, 3, 10, 3, 0, 2],
-    "furnishing": [
-        "Semi-Furnished", "Fully Furnished", "Semi-Furnished",
-        "Semi-Furnished", "Fully Furnished",
-        "Semi-Furnished", "Fully Furnished",
-        "Unfurnished", "Semi-Furnished",
-        "Fully Furnished", "Fully Furnished",
-        "Unfurnished", "Semi-Furnished"
-    ],
-    "parking": [1, 1, 2, 1, 2, 1, 2, 1, 1, 2, 3, 0, 2],
-    "nearby_facilities": [8, 9, 9, 9, 10, 7, 8, 8, 9, 10, 10, 6, 7],
-    "price": [
-        3800000, 5200000, 7000000,
-        8200000, 12500000,
-        5500000, 7600000,
-        4800000, 7200000,
-        12000000, 18500000,
-        4200000, 6800000
-    ]
+locations = [
+    "Jagatpura",
+    "Malviya Nagar",
+    "Mansarovar",
+    "Vaishali Nagar",
+    "C-Scheme",
+    "Ajmer Road"
+]
+
+furnishings = [
+    "Unfurnished",
+    "Semi-Furnished",
+    "Fully Furnished"
+]
+
+rows = []
+
+base_prices = {
+    "Jagatpura": 4200,
+    "Malviya Nagar": 6800,
+    "Mansarovar": 5200,
+    "Vaishali Nagar": 6100,
+    "C-Scheme": 10500,
+    "Ajmer Road": 3600
 }
 
-df = pd.DataFrame(data)
+for location in locations:
+    for sqft in [800, 1050, 1250, 1500, 1800, 2200, 2600]:
+        for bedrooms in [1, 2, 3, 4]:
+            for furnishing in furnishings:
+                bathrooms = max(1, bedrooms - 1)
+                balcony = min(3, bedrooms)
+                age_of_property = 5
+                parking = 1 if bedrooms <= 2 else 2
+                nearby_facilities = 7
+
+                furnishing_bonus = {
+                    "Unfurnished": 0,
+                    "Semi-Furnished": 350000,
+                    "Fully Furnished": 700000
+                }[furnishing]
+
+                price = (
+                    sqft * base_prices[location]
+                    + bedrooms * 250000
+                    + bathrooms * 120000
+                    + balcony * 70000
+                    + parking * 200000
+                    + furnishing_bonus
+                    + nearby_facilities * 50000
+                )
+
+                rows.append({
+                    "location": location,
+                    "sqft": sqft,
+                    "bedrooms": bedrooms,
+                    "bathrooms": bathrooms,
+                    "balcony": balcony,
+                    "age_of_property": age_of_property,
+                    "furnishing": furnishing,
+                    "parking": parking,
+                    "nearby_facilities": nearby_facilities,
+                    "price": price
+                })
+
+df = pd.DataFrame(rows)
 
 encoders = {}
 
@@ -65,8 +96,8 @@ X = df[
 y = df["price"]
 
 model = XGBRegressor(
-    n_estimators=250,
-    learning_rate=0.08,
+    n_estimators=300,
+    learning_rate=0.07,
     max_depth=5,
     subsample=0.9,
     colsample_bytree=0.9,
@@ -78,4 +109,4 @@ model.fit(X, y)
 joblib.dump(model, "property_model.pkl")
 joblib.dump(encoders, "encoders.pkl")
 
-print("Model and encoders saved successfully.")
+print("Advanced Seek A Nest model trained successfully.")
