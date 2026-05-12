@@ -1,156 +1,81 @@
-import pandas as pd
 import joblib
+import pandas as pd
 
 from sklearn.preprocessing import LabelEncoder
-from sklearn.ensemble import RandomForestRegressor
+from xgboost import XGBRegressor
 
-# =========================
-# SAMPLE DATA
-# =========================
 
 data = {
-
     "location": [
-        "Malviya Nagar",
-        "Mansarovar",
-        "Vaishali Nagar",
-        "Jagatpura",
-        "C-Scheme"
+        "Jagatpura", "Jagatpura", "Jagatpura",
+        "Malviya Nagar", "Malviya Nagar",
+        "Mansarovar", "Mansarovar",
+        "Vaishali Nagar", "Vaishali Nagar",
+        "C-Scheme", "C-Scheme",
+        "Ajmer Road", "Ajmer Road"
     ],
-
-    "sqft": [
-        1200,
-        1500,
-        1800,
-        2200,
-        3000
-    ],
-
-    "bedrooms": [
-        2,
-        3,
-        3,
-        4,
-        5
-    ],
-
-    "bathrooms": [
-        2,
-        2,
-        3,
-        4,
-        5
-    ],
-
-    "balcony": [
-        1,
-        2,
-        2,
-        3,
-        4
-    ],
-
-    "age_of_property": [
-        10,
-        7,
-        5,
-        3,
-        1
-    ],
-
+    "sqft": [1050, 1400, 1800, 1500, 2200, 1250, 1800, 1100, 1700, 1800, 3000, 1500, 2400],
+    "bedrooms": [2, 3, 3, 3, 4, 2, 3, 2, 3, 3, 5, 0, 3],
+    "bathrooms": [2, 2, 3, 2, 4, 2, 3, 2, 3, 3, 5, 0, 3],
+    "balcony": [1, 2, 2, 2, 3, 1, 2, 1, 2, 2, 4, 0, 2],
+    "age_of_property": [4, 3, 2, 7, 4, 8, 5, 6, 3, 10, 3, 0, 2],
     "furnishing": [
-        "Semi-Furnished",
-        "Fully Furnished",
-        "Semi-Furnished",
-        "Fully Furnished",
-        "Fully Furnished"
+        "Semi-Furnished", "Fully Furnished", "Semi-Furnished",
+        "Semi-Furnished", "Fully Furnished",
+        "Semi-Furnished", "Fully Furnished",
+        "Unfurnished", "Semi-Furnished",
+        "Fully Furnished", "Fully Furnished",
+        "Unfurnished", "Semi-Furnished"
     ],
-
-    "parking": [
-        1,
-        1,
-        2,
-        2,
-        3
-    ],
-
-    "nearby_facilities": [
-        6,
-        7,
-        8,
-        9,
-        10
-    ],
-
+    "parking": [1, 1, 2, 1, 2, 1, 2, 1, 1, 2, 3, 0, 2],
+    "nearby_facilities": [8, 9, 9, 9, 10, 7, 8, 8, 9, 10, 10, 6, 7],
     "price": [
-        4500000,
-        6500000,
-        8500000,
-        12000000,
-        18000000
+        3800000, 5200000, 7000000,
+        8200000, 12500000,
+        5500000, 7600000,
+        4800000, 7200000,
+        12000000, 18500000,
+        4200000, 6800000
     ]
 }
 
-# =========================
-# DATAFRAME
-# =========================
-
 df = pd.DataFrame(data)
 
-# =========================
-# LABEL ENCODERS
-# =========================
+encoders = {}
 
-location_encoder = LabelEncoder()
-furnishing_encoder = LabelEncoder()
+for col in ["location", "furnishing"]:
+    encoder = LabelEncoder()
+    df[col] = encoder.fit_transform(df[col])
+    encoders[col] = encoder
 
-df["location"] = location_encoder.fit_transform(df["location"])
-
-df["furnishing"] = furnishing_encoder.fit_transform(
-    df["furnishing"]
-)
-
-# =========================
-# FEATURES
-# =========================
-
-X = df[[
-    "location",
-    "sqft",
-    "bedrooms",
-    "bathrooms",
-    "balcony",
-    "age_of_property",
-    "furnishing",
-    "parking",
-    "nearby_facilities"
-]]
-
-# =========================
-# TARGET
-# =========================
+X = df[
+    [
+        "location",
+        "sqft",
+        "bedrooms",
+        "bathrooms",
+        "balcony",
+        "age_of_property",
+        "furnishing",
+        "parking",
+        "nearby_facilities"
+    ]
+]
 
 y = df["price"]
 
-# =========================
-# MODEL
-# =========================
-
-model = RandomForestRegressor()
+model = XGBRegressor(
+    n_estimators=250,
+    learning_rate=0.08,
+    max_depth=5,
+    subsample=0.9,
+    colsample_bytree=0.9,
+    random_state=42
+)
 
 model.fit(X, y)
 
-# =========================
-# SAVE MODEL
-# =========================
-
 joblib.dump(model, "property_model.pkl")
-
-encoders = {
-    "location": location_encoder,
-    "furnishing": furnishing_encoder
-}
-
 joblib.dump(encoders, "encoders.pkl")
 
-print("FILES CREATED SUCCESSFULLY")
+print("Model and encoders saved successfully.")
