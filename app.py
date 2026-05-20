@@ -372,22 +372,68 @@ PANELS / RESULT
     color: white !important;
 }
 
-.metric-card {
-    background: rgba(255,255,255,0.16);
-    border: 1px solid rgba(255,255,255,0.25);
+/* UPDATED: AI valuation price cards visibility fix */
+.result-box .metric-card {
+    background: #ffffff !important;
+    border: 2px solid #111827 !important;
     border-radius: 18px;
-    padding: 20px;
+    padding: 22px 16px;
     text-align: center;
+    box-shadow: 0 10px 28px rgba(0,0,0,0.22);
+}
+
+.result-box .metric-card,
+.result-box .metric-card *,
+.result-box .metric-card div,
+.result-box .metric-card span,
+.result-box .metric-number,
+.result-box .metric-label {
+    color: #000000 !important;
+    -webkit-text-fill-color: #000000 !important;
+    opacity: 1 !important;
+    text-shadow: none !important;
+}
+
+.result-box .metric-number {
+    font-size: 30px;
+    font-weight: 950;
+    line-height: 1.25;
+}
+
+.result-box .metric-label {
+    font-weight: 900;
+    margin-top: 8px;
+}
+
+.metric-card {
+    background: #ffffff !important;
+    border: 2px solid #111827 !important;
+    border-radius: 18px;
+    padding: 22px 16px;
+    text-align: center;
+    box-shadow: 0 10px 28px rgba(0,0,0,0.12);
+}
+
+.metric-card,
+.metric-card *,
+.metric-number,
+.metric-label {
+    color: #000000 !important;
+    -webkit-text-fill-color: #000000 !important;
+    opacity: 1 !important;
+    text-shadow: none !important;
 }
 
 .metric-number {
-    font-size: 24px;
-    font-weight: 900;
-    color: white !important;
+    font-size: 30px;
+    font-weight: 950;
+    line-height: 1.25;
 }
 
 .metric-label {
-    color: #f3f4f6 !important;
+    color: #000000 !important;
+    font-weight: 900;
+    margin-top: 8px;
 }
 
 .facility-chip {
